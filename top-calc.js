@@ -3,7 +3,7 @@ const display = document.querySelector('.displayContainer');
 
 let operators = [];
 
-buttons.forEach(button => button.addEventListener('click', function(e){
+buttons.forEach(button => button.addEventListener('click', function(){
     
     switch(button.className){
         case 'clear':
@@ -56,12 +56,95 @@ buttons.forEach(button => button.addEventListener('click', function(e){
         case 'dot':
             operators.push('.');
             break;
+        case 'equals':
+            break;
     }
 
     console.log(operators);
 }));
 
-const add = function(num1, num2) {
+const numGrouper = function(arr) {
+    let newArr = [];
+    let numString = '';
+
+    for(let i = 0; i < arr.length; i++){
+        if(i === (arr.length - 1) && !isNaN(arr[i])){
+            numString += arr[i];
+            newArr.push(numString);
+        }
+        else if(!isNaN(arr[i])){
+            numString += arr[i];
+        }
+        else if(arr[i] === '-' || arr[i] === '+' || arr[i] === '*' || arr[i] === '/'){
+            newArr.push(numString);
+            
+            numString = '';
+            newArr.push(arr[i]);
+        }
+    }
+
+    return newArr;
+};
+
+numGrouper([1,2,'+',3,3,'-',5,6,'/']);
+
+const evaluator = function(arr) {
+    let lhs;
+    let rhs;
+    let result = [];
+    let opIndex; //operator index
+    let i = 0;
+
+    if(isNaN(arr[-1] || isNaN(arr[0]))){ //if the last or first element in the array is not a number, there was an error
+        return;
+    }
+
+    while(arr.length > 1){
+        let mult = arr.indexOf('*');
+        let div = arr.indexOf('/');
+        let add = arr.indexOf('+');
+        let sub = arr.indexOf('-');
+
+        if(mult < div && mult != -1 || mult != -1 && div === -1){
+            console.log(`Step ${i} of * process: ${arr} index of * ${arr.indexOf('*')}`);
+            result = [];
+            lhs = arr[mult - 1];
+            rhs = arr[mult + 1];
+            result.push(multiply([parseInt(lhs), parseInt(rhs)]));
+            arr.splice((mult - 1), 3, result[0]);
+        }
+        else if(div < mult && div != -1 || div != -1 && mult === -1){
+            console.log(`Step ${i} of / process: ${arr} index of / ${arr.indexOf('/')}`);
+            result = [];
+            lhs = arr[div - 1];
+            rhs = arr[div + 1];
+            result.push(divide(parseInt(lhs), parseInt(rhs)));
+            arr.splice((div - 1), 3, result[0]);
+        }
+        else if(add < sub && add != -1 || add != -1 && sub === -1){
+            console.log(`Step ${i} of + process: ${arr} index of + ${arr.indexOf('+')}`);
+            result = [];
+            lhs = arr[add - 1];
+            rhs = arr[add + 1];
+            result.push(addition(parseInt(lhs), parseInt(rhs)));
+            arr.splice((add - 1), 3, result[0]);
+        }
+        else if(sub < add && sub != -1 || sub != -1 && add == -1){
+            console.log(`Step ${i} of - process: ${arr} index of - ${arr.indexOf('-')}`);
+            result = [];
+            lhs = arr[sub - 1];
+            rhs = arr[sub + 1];
+            result.push(subtract(parseInt(lhs), parseInt(rhs)));
+            arr.splice((sub - 1), 3, result[0]);
+        }
+    }
+
+    console.log(arr);
+};
+
+
+
+const addition = function(num1, num2) {
 	return num1 + num2;
 };
 
@@ -97,3 +180,8 @@ const factorial = function(num) {
   }
 };
 
+const divide = function(num1, num2){
+    return num1 / num2;
+};
+
+evaluator([3,'+',3,'+',3,'-',1,'*',2,'+',4]);
