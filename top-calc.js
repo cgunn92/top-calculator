@@ -4,15 +4,17 @@ const display = document.querySelector('.displayContainer');
 let operators = [];
 
 buttons.forEach(button => button.addEventListener('click', function(){
+
+    let grouped;
+    let result;
     
     switch(button.className){
         case 'clear':
-            while(operators.length != 0){
-                operators.pop()
-            }
+            operators = [];
+            display.textContent = '';
             break;
         case 'divide':
-            operators.push('//');
+            operators.push('/');
             break;
         case 'seven':
             operators.push(7);
@@ -57,10 +59,19 @@ buttons.forEach(button => button.addEventListener('click', function(){
             operators.push('.');
             break;
         case 'equals':
+            grouped = numGrouper(operators);
+            result = evaluator(grouped);
+            operators = [];
             break;
     }
 
-    console.log(operators);
+    if(result === undefined){
+        display.textContent = operators.join('');
+    }
+    else{
+        display.textContent = result;
+    }
+
 }));
 
 const numGrouper = function(arr) {
@@ -139,7 +150,7 @@ const evaluator = function(arr) {
         }
     }
 
-    console.log(arr);
+    return arr;
 };
 
 
@@ -174,14 +185,20 @@ const power = function(num1, num2) {
 
 const factorial = function(num) {
 	if(num <= 1){
-    return 1;
+        return 1;
   } else {
-    return num * factorial(num - 1);
+        return num * factorial(num - 1);
   }
 };
 
 const divide = function(num1, num2){
-    return num1 / num2;
+    if(parseInt(num2) === 0){
+        return 'undefined, division by 0';
+    }
+    else{
+        return num1 / num2;   
+    }
+    
 };
 
 evaluator([3,'+',3,'+',3,'-',1,'*',2,'+',4]);
